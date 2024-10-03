@@ -60,6 +60,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
+      - name: Verify upload
+        run: gh release view ${{ github.event.release.tag_name }} --json assets -q '.assets[].name'
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
   create-release:
     needs: [build, upload-release-asset] # This job depends on the build and upload-release-asset jobs
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
