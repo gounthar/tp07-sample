@@ -1,51 +1,52 @@
 name: Build and Deploy
 
+# Define the events that trigger the workflow
 on:
-  push:
+  push: # Trigger on push events to the main branch
     branches:
       - main
-  pull_request:
+  pull_request: # Trigger on pull request events to the main branch
     branches:
       - main
-  release:
+  release: # Trigger on release creation
     types: [created]
-  workflow_dispatch:
+  workflow_dispatch: # Allow manual triggering of the workflow
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3 # Check out the repository code
 
       - name: Set up Java 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v3 # Set up Java 17 environment
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn install
+        run: mvn install # Build the project using Maven
 
       - name: Upload war file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3 # Upload the built WAR file as an artifact
         with:
           name: war-file
           path: target/*.war
 
   upload-release-asset:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release'
+    needs: build # This job depends on the build job
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    if: github.event_name == 'release' # Only run this job on release events
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3 # Check out the repository code
 
       - name: Upload war file to GitHub package
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1 # Upload the WAR file to the release
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ github.event.release.upload_url }} # Use the release upload URL
           asset_path: target/*.war
           asset_name: sample.war
           asset_content_type: application/zip
