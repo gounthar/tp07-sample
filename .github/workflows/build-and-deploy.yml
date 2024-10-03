@@ -68,7 +68,7 @@ jobs:
   create-release:
     needs: [build, upload-release-asset] # This job depends on the build and upload-release-asset jobs
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
-    #if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only run this job on push events to the main branch
+    if: github.event.release.tag_name != '' # Only run this job if the release tag name is not null
     steps:
       - name: Check out repository
         uses: actions/checkout@v4 # Check out the repository code
