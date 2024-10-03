@@ -1,10 +1,16 @@
-version: 2
+version: 2 # Specify the version of the Dependabot configuration
+
 updates:
-  - package-ecosystem: "maven"
-    directory: "/"
+  - package-ecosystem: "maven" # Define the package ecosystem to be updated (Maven)
+    directory: "/" # Specify the directory containing the dependencies
     schedule:
-      interval: "weekly"
-  - package-ecosystem: "github-actions"
-    directory: "/.github/workflows"
+      interval: "weekly" # Set the update schedule to weekly
+
+  - package-ecosystem: "github-actions" # Define the package ecosystem to be updated (GitHub Actions)
+    directory: "/.github/workflows" # Specify the directory containing the GitHub Actions workflows
     schedule:
-      interval: "weekly"
+      interval: "weekly" # Set the update schedule to weekly
+
+# Define the events that trigger the workflow
+on:
+  workflow_dispatch: # Allow the workflow to be manually triggered
