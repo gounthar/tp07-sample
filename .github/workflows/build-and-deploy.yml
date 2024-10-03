@@ -91,7 +91,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Push changes
-        run: git push # Push the changes to the repository
+        run: git push origin HEAD:main # Push the changes to the main branch
 
   upload-release-asset:
     needs: [build, create-release] # This job depends on the build job
