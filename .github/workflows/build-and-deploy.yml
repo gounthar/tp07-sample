@@ -77,7 +77,7 @@ jobs:
           git commit -m "Update project version to $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" # Commit the changes
 
       - name: Create release
-        uses: softprops/action-gh-release@v1 # Create a new GitHub release
+        uses: softprops/action-gh-release@v2 # Create a new GitHub release
         with:
           tag_name: ${{ format('v{0}', steps.version.outputs.version) }} # Set the tag name for the release
           name: Release ${{ format('v{0}', steps.version.outputs.version) }} # Set the name for the release
