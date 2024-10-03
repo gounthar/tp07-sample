@@ -38,35 +38,8 @@ jobs:
           name: war-file
           path: target/*.war
 
-  upload-release-asset:
-    needs: build # This job depends on the build job
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner
-    if: github.event.release.tag_name != '' # Only run this job if the release tag name is not null
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4 # Check out the repository code
-
-      - name: Download war file
-        uses: actions/download-artifact@v4 # Download the WAR file artifact
-        with:
-          name: war-file
-          path: target
-
-      - name: Install GitHub CLI
-        run: sudo apt-get install gh
-
-      - name: Upload war file to GitHub release
-        run: gh release upload ${{ github.event.release.tag_name }} target/*.war --clobber
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-
-      - name: Verify upload
-        run: gh release view ${{ github.event.release.tag_name }} --json assets -q '.assets[].name'
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-
   create-release:
-    needs: [build, upload-release-asset] # This job depends on the build and upload-release-asset jobs
+    needs: build # This job depends on the build and upload-release-asset jobs
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
     if: github.event.release.tag_name != '' # Only run this job if the release tag name is not null
     steps:
@@ -113,3 +86,30 @@ jobs:
 
       - name: Push changes
         run: git push # Push the changes to the repository
+
+  upload-release-asset:
+    needs: [build, create-release] # This job depends on the build job
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    #if: github.event.release.tag_name != '' # Only run this job if the release tag name is not null
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4 # Check out the repository code
+
+      - name: Download war file
+        uses: actions/download-artifact@v4 # Download the WAR file artifact
+        with:
+          name: war-file
+          path: target
+
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh
+
+      - name: Upload war file to GitHub release
+        run: gh release upload ${{ github.event.release.tag_name }} target/*.war --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Verify upload
+        run: gh release view ${{ github.event.release.tag_name }} --json assets -q '.assets[].name'
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
