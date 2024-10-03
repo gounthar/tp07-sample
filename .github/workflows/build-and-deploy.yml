@@ -7,6 +7,9 @@ on:
   pull_request:
     branches:
       - main
+  release:
+    types: [created]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,7 +23,8 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin'  # or your preferred distribution
+          distribution: 'temurin'
+
       - name: Build with Maven
         run: mvn install
 
@@ -29,6 +33,14 @@ jobs:
         with:
           name: war-file
           path: target/*.war
+
+  upload-release-asset:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
 
       - name: Upload war file to GitHub package
         uses: actions/upload-release-asset@v1
