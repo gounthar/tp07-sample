@@ -9,7 +9,7 @@ on:
     branches:
       - main
   release: # Trigger on release creation
-    types: [ created ]
+    types: [created]
   workflow_dispatch: # Allow manual triggering of the workflow
 
 jobs:
@@ -61,28 +61,30 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
+          git config --global user.name 'github-actions' # Set Git user name
+          git config --global user.email 'github-actions@github.com' # Set Git user email
 
       - name: Get version
         id: version
-        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT # Get the project version
 
       - name: Update project version
-        run: mvn versions:set -DnewVersion="$(date +'%Y.%m.%d-%H%M%S')" # Update the project version using the current date and time
+        run: mvn versions:set -DnewVersion="$(date +'%Y.%m.%d-%H%M%S')" # Update the project version to the current date and time
 
       - name: Commit updated pom.xml
         run: |
-          git add pom.xml
-          git commit -m "Update project version to $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
+          git add pom.xml # Add the updated pom.xml to Git
+          git commit -m "Update project version to $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" # Commit the changes
 
       - name: Create release
-        uses: softprops/action-gh-release@v1 # Create a new release
+        uses: softprops/action-gh-release@v1 # Create a new GitHub release
         with:
-          tag_name: ${{ format('v{0}', steps.version.outputs.version) }} # Use the version from the previous step
-          name: Release ${{ format('v{0}', steps.version.outputs.version) }} # Use the version from the previous step
-          draft: false
-          prerelease: false
+          tag_name: ${{ format('v{0}', steps.version.outputs.version) }} # Set the tag name for the release
+          name: Release ${{ format('v{0}', steps.version.outputs.version) }} # Set the name for the release
+          draft: false # Mark the release as not a draft
+          prerelease: false # Mark the release as not a pre-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use the GitHub token for authentication
 
       - name: Push changes
-        run: git push
+        run: git push # Push the changes to the repository
