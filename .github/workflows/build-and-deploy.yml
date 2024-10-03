@@ -8,8 +8,6 @@ on:
   pull_request: # Trigger on pull request events to the main branch
     branches:
       - main
-  release: # Trigger on release creation
-    types: [created]
   workflow_dispatch: # Allow manual triggering of the workflow
 
 permissions:
@@ -44,7 +42,6 @@ jobs:
   create-release:
     needs: build # This job depends on the build and upload-release-asset jobs
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
-    if: github.event.release.tag_name != '' # Only run this job if the release tag name is not null
     steps:
       - name: Check out repository
         uses: actions/checkout@v4 # Check out the repository code
@@ -99,13 +96,9 @@ jobs:
       - name: Push changes
         run: git push origin HEAD:main
 
-      - name: Push changes
-        run: git push origin HEAD:main # Push the changes to the main branch
-
   upload-release-asset:
     needs: [build, create-release] # This job depends on the build job
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
-    if: github.event.release.tag_name != '' # Only run this job if the release tag name is not null
     steps:
       - name: Check out repository
         uses: actions/checkout@v4 # Check out the repository code
