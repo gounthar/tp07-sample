@@ -50,3 +50,32 @@ jobs:
           asset_path: target/*.war
           asset_name: sample.war
           asset_content_type: application/zip
+
+  create-release:
+    needs: build # This job depends on the build job
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only run this job on push events to the main branch
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4 # Check out the repository code
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+
+      - name: Update project version
+        run: mvn versions:set -DnewVersion=$(date +'%Y%m%d%H%M%S') # Update the project version using the current date and time
+
+      - name: Commit updated pom.xml
+        run: |
+          git add pom.xml
+          git commit -m 'Update project version'
+
+      - name: Create release
+        uses: actions/create-release@v1 # Create a new release
+        with:
+          tag_name: $(date +'%Y%m%d%H%M%S') # Use the current date and time as the tag name
+          release_name: Release $(date +'%Y%m%d%H%M%S') # Use the current date and time as the release name
+          draft: false
+          prerelease: false
