@@ -91,6 +91,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
+      - name: Set output tag name
+        run: echo "tag_name=${{ format('v{0}', steps.version.outputs.version) }}" >> $GITHUB_ENV
+
       - name: Pull latest changes
         run: |
           git pull --rebase origin main || {
@@ -121,11 +124,11 @@ jobs:
         run: sudo apt-get install gh
 
       - name: Upload war file to GitHub release
-        run: gh release upload ${{ needs.create-release.outputs.tag_name }} target/*.war --clobber
+        run: gh release upload ${{ env.tag_name }} target/*.war --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Verify upload
-        run: gh release view ${{ needs.create-release.outputs.tag_name }} --json assets -q '.assets[].name'
+        run: gh release view ${{ env.tag_name }} --json assets -q '.assets[].name'
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
