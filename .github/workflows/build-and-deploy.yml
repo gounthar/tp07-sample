@@ -65,8 +65,8 @@ jobs:
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
     #if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only run this job on push events to the main branch
     steps:
-      #- name: Check out repository
-      # uses: actions/checkout@v4 # Check out the repository code
+      - name: Check out repository
+        uses: actions/checkout@v4 # Check out the repository code
 
       - name: Set up Git
         run: |
@@ -84,6 +84,9 @@ jobs:
         run: |
           git add pom.xml # Add the updated pom.xml to Git
           git commit -m "Update project version to $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" # Commit the changes
+
+      - name: Build war file
+        run: mvn install # Build the project to generate the WAR file
 
       - name: Create release
         uses: softprops/action-gh-release@v2 # Create a new GitHub release
