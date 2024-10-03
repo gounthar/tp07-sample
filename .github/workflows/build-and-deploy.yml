@@ -41,7 +41,7 @@ jobs:
   upload-release-asset:
     needs: build # This job depends on the build job
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
-    if: github.event_name == 'release' # Only run this job on release events
+    #if: github.event_name == 'release' # Only run this job on release events
     steps:
       - name: Check out repository
         uses: actions/checkout@v4 # Check out the repository code
