@@ -46,6 +46,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4 # Check out the repository code
 
+      - name: Download war file
+        uses: actions/download-artifact@v4 # Download the WAR file artifact
+        with:
+          name: war-file
+          path: target
+
       - name: Upload war file to GitHub package
         uses: actions/upload-release-asset@v1 # Upload the WAR file to the release
         with:
