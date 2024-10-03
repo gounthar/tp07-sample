@@ -9,7 +9,7 @@ on:
     branches:
       - main
   release: # Trigger on release creation
-    types: [created]
+    types: [ created ]
   workflow_dispatch: # Allow manual triggering of the workflow
 
 jobs:
@@ -50,3 +50,39 @@ jobs:
           asset_path: target/*.war
           asset_name: sample.war
           asset_content_type: application/zip
+
+  create-release:
+    needs: build # This job depends on the build job
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only run this job on push events to the main branch
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4 # Check out the repository code
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+
+      - name: Get version
+        id: version
+        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+
+      - name: Update project version
+        run: mvn versions:set -DnewVersion="$(date +'%Y.%m.%d-%H%M%S')" # Update the project version using the current date and time
+
+      - name: Commit updated pom.xml
+        run: |
+          git add pom.xml
+          git commit -m "Update project version to $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1 # Create a new release
+        with:
+          tag_name: ${{ format('v{0}', steps.version.outputs.version) }} # Use the version from the previous step
+          name: Release ${{ format('v{0}', steps.version.outputs.version) }} # Use the version from the previous step
+          draft: false
+          prerelease: false
+
+      - name: Push changes
+        run: git push
