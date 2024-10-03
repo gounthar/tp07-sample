@@ -1,23 +1,24 @@
 name: Trigger Dependabot
 
+# Define the events that trigger the workflow
 on:
-  push:
+  push: # Trigger on push events to the main branch
     branches:
       - main
-  pull_request:
+  pull_request: # Trigger on pull request events to the main branch
     branches:
       - main
 
 jobs:
   dependabot:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Check out the repository code
 
       - name: Trigger Dependabot
         run: |
-          gh workflow run .github/dependabot.yml
+          gh workflow run dependabot.yml # Run the Dependabot workflow
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use the GitHub token for authentication
