@@ -71,6 +71,13 @@ jobs:
       - name: Build war file
         run: mvn install # Build the project to generate the WAR file
 
+      - name: Verify build success
+        run: |
+          if [ ! -f target/*.war ]; then
+            echo "WAR file not found in target directory"
+            exit 1
+          fi
+
       - name: Set up Git
         run: |
           git config --global user.name 'github-actions' # Set Git user name
