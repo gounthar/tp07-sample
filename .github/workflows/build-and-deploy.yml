@@ -107,29 +107,3 @@ jobs:
       - name: Push changes
         run: git push origin HEAD:main
 
-  upload-release-asset:
-    needs: create-release
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Download war file
-        uses: actions/download-artifact@v4
-        with:
-          name: war-file
-          path: target
-
-      - name: Install GitHub CLI
-        run: sudo apt-get install gh
-
-      - name: Upload war file to GitHub release
-        run: gh release upload ${{ env.tag_name }} target/*.war --clobber
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-
-      - name: Verify upload
-        run: gh release view ${{ env.tag_name }} --json assets -q '.assets[].name'
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
