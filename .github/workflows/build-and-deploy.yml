@@ -30,7 +30,7 @@ jobs:
         run: mvn install # Build the project using Maven
 
       - name: Upload war file
-        uses: actions/upload-artifact@v3 # Upload the built WAR file as an artifact
+        uses: actions/upload-artifact@v4 # Upload the built WAR file as an artifact
         with:
           name: war-file
           path: target/*.war
