@@ -9,7 +9,7 @@ on:
     branches:
       - main
   release: # Trigger on release creation
-    types: [created]
+    types: [ created ]
   workflow_dispatch: # Allow manual triggering of the workflow
 
 jobs:
@@ -64,6 +64,10 @@ jobs:
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
 
+      - name: Get version
+        id: version
+        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
+
       - name: Update project version
         run: mvn versions:set -DnewVersion="$(date +'%Y.%m.%d-%H%M%S')" # Update the project version using the current date and time
 
@@ -73,9 +77,12 @@ jobs:
           git commit -m "Update project version to $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
 
       - name: Create release
-        uses: actions/create-release@v1 # Create a new release
+        uses: softprops/action-gh-release@v1 # Create a new release
         with:
-          tag_name: $(date +'%Y%m%d%H%M%S') # Use the current date and time as the tag name
-          release_name: Release $(date +'%Y%m%d%H%M%S') # Use the current date and time as the release name
+          tag_name: ${{ format('v{0}', steps.version.outputs.version) }} # Use the version from the previous step
+          name: Release ${{ format('v{0}', steps.version.outputs.version) }} # Use the version from the previous step
           draft: false
           prerelease: false
+
+      - name: Push changes
+        run: git push
