@@ -92,6 +92,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Set output tag name
+        id: set_tag_name
         run: echo "tag_name=${{ format('v{0}', steps.version.outputs.version) }}" >> $GITHUB_ENV
 
       - name: Pull latest changes
@@ -129,6 +130,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Verify upload
-        run: gh release view ${{ env.tag_name }} --json assets -q '.assets[].name'
+        run: gh release view ${{ steps.set_tag_name.outputs.tag_name }} --json assets -q '.assets[].name'
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
