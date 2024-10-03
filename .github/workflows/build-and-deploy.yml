@@ -1,50 +1,50 @@
 name: Build and Deploy
 
-# Define the events that trigger the workflow
 on:
-  push: # Trigger on push events to the main branch
+  push:
     branches:
       - main
-  pull_request: # Trigger on pull request events to the main branch
+  pull_request:
     branches:
       - main
-  workflow_dispatch: # Allow manual triggering of the workflow
+  workflow_dispatch:
 
 permissions:
-  contents: write # Grant write permission to the contents
+  contents: write
 
 jobs:
   build:
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4 # Check out the repository code
+        uses: actions/checkout@v4
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4 # Set up Java 17 environment
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn install # Build the project using Maven
+        run: mvn install
 
       - name: List target directory contents
-        run: ls -la target # List the contents of the target directory
+        run: ls -la target
 
       - name: Upload war file
-        uses: actions/upload-artifact@v4 # Upload the built WAR file as an artifact
+        uses: actions/upload-artifact@v4
         with:
           name: war-file
           path: target/*.war
 
   create-release:
-    needs: build # This job depends on the build and upload-release-asset jobs
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    needs: build
+    runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4 # Check out the repository code
+        uses: actions/checkout@v4
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -53,7 +53,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build war file
-        run: mvn install # Build the project to generate the WAR file
+        run: mvn install
 
       - name: Verify build success
         run: |
@@ -64,29 +64,30 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.name 'github-actions' # Set Git user name
-          git config --global user.email 'github-actions@github.com' # Set Git user email
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
 
       - name: Get version
         id: version
-        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT # Get the project version
+        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
 
       - name: Update project version
-        run: mvn versions:set -DnewVersion="$(date +'%Y.%m.%d-%H%M%S')" # Update the project version to the current date and time
+        run: mvn versions:set -DnewVersion="$(date +'%Y.%m.%d-%H%M%S')"
 
       - name: Commit updated pom.xml
         run: |
-          git add pom.xml # Add the updated pom.xml to Git
-          git commit -m "Update project version to $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" # Commit the changes
+          git add pom.xml
+          git commit -m "Update project version to $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
 
       - name: Create release
-        uses: softprops/action-gh-release@v2 # Create a new GitHub release
+        id: create_release
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ format('v{0}', steps.version.outputs.version) }} # Set the tag name for the release
-          name: Release ${{ format('v{0}', steps.version.outputs.version) }} # Set the name for the release
-          draft: false # Mark the release as not a draft
-          prerelease: false # Mark the release as not a pre-release
-          files: target/*.war # Attach the WAR file to the release
+          tag_name: ${{ format('v{0}', steps.version.outputs.version) }}
+          name: Release ${{ format('v{0}', steps.version.outputs.version) }}
+          draft: false
+          prerelease: false
+          files: target/*.war
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
@@ -103,14 +104,15 @@ jobs:
         run: git push origin HEAD:main
 
   upload-release-asset:
-    needs: [build, create-release] # This job depends on the build job
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    needs: create-release
+    runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4 # Check out the repository code
+        uses: actions/checkout@v4
 
       - name: Download war file
-        uses: actions/download-artifact@v4 # Download the WAR file artifact
+        uses: actions/download-artifact@v4
         with:
           name: war-file
           path: target
@@ -119,11 +121,11 @@ jobs:
         run: sudo apt-get install gh
 
       - name: Upload war file to GitHub release
-        run: gh release upload ${{ github.event.release.tag_name }} target/*.war --clobber
+        run: gh release upload ${{ needs.create-release.outputs.tag_name }} target/*.war --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Verify upload
-        run: gh release view ${{ github.event.release.tag_name }} --json assets -q '.assets[].name'
+        run: gh release view ${{ needs.create-release.outputs.tag_name }} --json assets -q '.assets[].name'
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
