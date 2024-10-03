@@ -8,6 +8,7 @@ on:
   pull_request: # Trigger on pull request events to the main branch
     branches:
       - main
+  workflow_dispatch: # Allow the workflow to be manually triggered
 
 permissions:
   contents: read

@@ -10,7 +10,3 @@ updates:
     directory: "/.github/workflows" # Specify the directory containing the GitHub Actions workflows
     schedule:
       interval: "weekly" # Set the update schedule to weekly
-
-# Define the events that trigger the workflow
-on:
-  workflow_dispatch: # Allow the workflow to be manually triggered
