@@ -65,12 +65,12 @@ jobs:
           git config --global user.email 'github-actions@github.com'
 
       - name: Update project version
-        run: mvn versions:set -DnewVersion=$(date +'%Y%m%d%H%M%S') # Update the project version using the current date and time
+        run: mvn versions:set -DnewVersion="$(date +'%Y.%m.%d-%H%M%S')" # Update the project version using the current date and time
 
       - name: Commit updated pom.xml
         run: |
           git add pom.xml
-          git commit -m 'Update project version'
+          git commit -m "Update project version to $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
 
       - name: Create release
         uses: actions/create-release@v1 # Create a new release
