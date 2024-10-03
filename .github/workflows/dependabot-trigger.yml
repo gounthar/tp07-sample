@@ -9,6 +9,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  actions: write # Grant write permission to actions
+
 jobs:
   dependabot:
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
