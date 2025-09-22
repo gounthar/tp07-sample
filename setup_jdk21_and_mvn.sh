@@ -59,8 +59,8 @@ LATEST_JAVA21_TEM=$(bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk list j
   }' | sort -V | tail -1)
 echo "[INFO] Latest Java 21 Temurin identifier: $LATEST_JAVA21_TEM"
 if [ -z "$LATEST_JAVA21_TEM" ]; then
-  echo "[ERROR] Could not determine latest Java 21 Temurin identifier from SDKMAN output." >&2
-  exit 1
+  echo "[WARN] Could not determine latest Java 21 Temurin identifier from SDKMAN output. Falling back to 21.0.8-tem." >&2
+  LATEST_JAVA21_TEM="21.0.8-tem"
 fi
 echo "[INFO] Java identifier check complete."
 
