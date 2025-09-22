@@ -1,0 +1,9 @@
+tasks:
+  - name: Setup JDK 21 (Temurin) and Build
+    init: bash setup_jdk21_and_mvn.sh
+    command: echo "Java 21 Temurin installed and Maven build complete."
+
+# Optionally, expose ports or set up VS Code extensions here
+# ports:
+#   - port: 8080
+#     onOpen: open-preview
