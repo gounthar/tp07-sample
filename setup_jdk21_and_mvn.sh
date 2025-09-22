@@ -31,6 +31,13 @@ fi
 export PATH="$SDKMAN_DIR/bin:$PATH"
 echo "[INFO] SDKMAN loaded."
 
+echo "[INFO] Checking if 'sdk' command is available..."
+if ! command -v sdk >/dev/null 2>&1; then
+  echo "[ERROR] 'sdk' command not found after SDKMAN load. Exiting."
+  exit 1
+fi
+echo "[INFO] 'sdk' command is available."
+
 
 
 
