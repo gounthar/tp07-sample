@@ -2,7 +2,7 @@
 set -eo pipefail
 # Install SDKMAN if not already installed
 if [ ! -d "$HOME/.sdkman" ]; then
-  curl -s "https://get.sdkman.io" | bash
+  curl -fsSL "https://get.sdkman.io" | bash
 fi
 
 
@@ -27,6 +27,7 @@ fi
 
 # Install and set as default, auto-confirming prompts
 sdk install java "$LATEST_JAVA21_TEM" -y
+sdk default java "$LATEST_JAVA21_TEM"
 
 # Print Java version for verification
 java -version
