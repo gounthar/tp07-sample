@@ -44,9 +44,11 @@ echo "[INFO] 'sdk' command is available."
 
 # Find the latest Java 21 Temurin version (robust to SDKMAN output changes)
 echo "[INFO] Finding latest Java 21 Temurin identifier..."
-echo "[DEBUG] Raw output of 'sdk list java':"
-bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk list java | cat"
-echo "[DEBUG] End of 'sdk list java' output."
+if [[ -n "$RUNNER_DEBUG" ]]; then
+  echo "[DEBUG] Raw output of 'sdk list java':"
+  sdk list java
+  echo "[DEBUG] End of 'sdk list java' output."
+fi
 LATEST_JAVA21_TEM=$(bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk list java | cat" | \
   grep -E '\|\s*21(\.[0-9]+)*\.\d+-tem\s*\|' | \
   grep -vE '\|\s*(fx|ea|rc|open|j9|graalvm)' | \
