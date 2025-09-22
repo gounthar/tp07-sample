@@ -44,5 +44,8 @@ sdk default java "$LATEST_JAVA21_TEM"
 # Print Java version for verification
 java -version
 
-# Run Maven install
-mvn install
+# Run Maven install (ensure Maven exists; batch mode for CI/IDE logs)
+if ! command -v mvn >/dev/null 2>&1; then
+  sdk install maven -y
+fi
+mvn -B -ntp install
