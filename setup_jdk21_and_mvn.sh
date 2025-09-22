@@ -78,9 +78,8 @@ echo "[INFO] Java install complete."
 
 # Print Java version for verification
 echo "[INFO] Java version after install:"
-java -version
+java -version 2>&1 | head -n 1
 echo "[INFO] Java version check complete."
-
 
 # Run Maven install (ensure Maven exists; batch mode for CI/IDE logs)
 echo "[INFO] Checking for Maven installation..."
