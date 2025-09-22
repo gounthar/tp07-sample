@@ -1,13 +1,7 @@
-# Check if sdk command is available (in subshell)
-echo "[INFO] Checking if 'sdk' command is available (subshell)..."
-if ! bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && command -v sdk" >/dev/null 2>&1; then
-  echo "[ERROR] 'sdk' command not found after SDKMAN load (subshell). Exiting."
-  exit 1
-fi
-echo "[INFO] 'sdk' command is available (subshell)."
-#!/bin/bash
-
-set -eo pipefail
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+trap 'echo "[ERROR] ${BASH_SOURCE[0]}:${LINENO}: ${BASH_COMMAND} failed" >&2' ERR
 
 echo "[INFO] Script started."
 # Install SDKMAN if not already installed in either $HOME or /usr/local
