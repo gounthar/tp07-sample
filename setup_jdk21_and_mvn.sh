@@ -85,7 +85,7 @@ echo "[INFO] Java version check complete."
 echo "[INFO] Checking for Maven installation..."
 if ! command -v mvn >/dev/null 2>&1; then
   echo "[INFO] Installing Maven..."
-  bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk install maven -y"
+  sdk install maven -y
 else
   echo "[INFO] Maven already installed."
 fi
