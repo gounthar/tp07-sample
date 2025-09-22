@@ -1,7 +1,8 @@
 #!/bin/bash
+set -eo pipefail
 # Install SDKMAN if not already installed
 if [ ! -d "$HOME/.sdkman" ]; then
-  curl -s "https://get.sdkman.io" | bash
+  curl -fsSL "https://get.sdkman.io" | bash
 fi
 
 
@@ -18,17 +19,33 @@ fi
 
 
 # Find the latest Java 21 Temurin version
-LATEST_JAVA21_TEM=$(sdk list java | grep -E '21\\.[0-9]+\\.[0-9]+-tem' | awk '{print $NF}' | sort -V | tail -1)
+LATEST_JAVA21_TEM=$(
+  sdk list java | awk -F '|' '
+    /\|\s*Identifier\s*$/ { idcol=NF; next }
+    idcol && $idcol ~ /21(\.[0-9]+)+-tem$/ {
+      gsub(/^[ \t]+|[ \t]+$/, "", $idcol);
+      print $idcol
+    }
+  ' | sort -V | tail -1
+)
+if [ -z "$LATEST_JAVA21_TEM" ]; then
+  echo "Could not determine latest Java 21 Temurin identifier from SDKMAN output." >&2
+  exit 1
+fi
 if [ -z "$LATEST_JAVA21_TEM" ]; then
   echo "No Java 21 Temurin version found via SDKMAN. Exiting."
   exit 1
 fi
 
 # Install and set as default, auto-confirming prompts
-yes | sdk install java "$LATEST_JAVA21_TEM"
+sdk install java "$LATEST_JAVA21_TEM" -y
+sdk default java "$LATEST_JAVA21_TEM"
 
 # Print Java version for verification
 java -version
 
-# Run Maven install
-mvn install
+# Run Maven install (ensure Maven exists; batch mode for CI/IDE logs)
+if ! command -v mvn >/dev/null 2>&1; then
+  sdk install maven -y
+fi
+mvn -B -ntp install
