@@ -19,7 +19,19 @@ fi
 
 
 # Find the latest Java 21 Temurin version
-LATEST_JAVA21_TEM=$(sdk list java | grep -E '21(\.[0-9]+)+-tem' | awk '{print $NF}' | sort -V | tail -1)
+LATEST_JAVA21_TEM=$(
+  sdk list java | awk -F '|' '
+    /\|\s*Identifier\s*$/ { idcol=NF; next }
+    idcol && $idcol ~ /21(\.[0-9]+)+-tem$/ {
+      gsub(/^[ \t]+|[ \t]+$/, "", $idcol);
+      print $idcol
+    }
+  ' | sort -V | tail -1
+)
+if [ -z "$LATEST_JAVA21_TEM" ]; then
+  echo "Could not determine latest Java 21 Temurin identifier from SDKMAN output." >&2
+  exit 1
+fi
 if [ -z "$LATEST_JAVA21_TEM" ]; then
   echo "No Java 21 Temurin version found via SDKMAN. Exiting."
   exit 1
