@@ -1,10 +1,10 @@
-# Check if sdk command is available
-echo "[INFO] Checking if 'sdk' command is available..."
-if ! command -v sdk >/dev/null 2>&1; then
-  echo "[ERROR] 'sdk' command not found after SDKMAN load. Exiting."
+# Check if sdk command is available (in subshell)
+echo "[INFO] Checking if 'sdk' command is available (subshell)..."
+if ! bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && command -v sdk" >/dev/null 2>&1; then
+  echo "[ERROR] 'sdk' command not found after SDKMAN load (subshell). Exiting."
   exit 1
 fi
-echo "[INFO] 'sdk' command is available."
+echo "[INFO] 'sdk' command is available (subshell)."
 #!/bin/bash
 
 set -eo pipefail
@@ -44,9 +44,9 @@ echo "[INFO] SDKMAN loaded."
 # Find the latest Java 21 Temurin version (robust to SDKMAN output changes)
 echo "[INFO] Finding latest Java 21 Temurin identifier..."
 echo "[DEBUG] Raw output of 'sdk list java':"
-sdk list java
+bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk list java | cat"
 echo "[DEBUG] End of 'sdk list java' output."
-LATEST_JAVA21_TEM=$(sdk list java | \
+LATEST_JAVA21_TEM=$(bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk list java | cat" | \
   grep -E '\|\s*21(\.[0-9]+)*\.\d+-tem\s*\|' | \
   grep -vE '\|\s*(fx|ea|rc|open|j9|graalvm)' | \
   awk -F '|' '{
@@ -67,8 +67,8 @@ echo "[INFO] Java identifier check complete."
 
 # Install and set as default, auto-confirming prompts
 echo "[INFO] Installing Java $LATEST_JAVA21_TEM..."
-sdk install java "$LATEST_JAVA21_TEM" -y
-sdk default java "$LATEST_JAVA21_TEM"
+bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk install java $LATEST_JAVA21_TEM -y"
+bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk default java $LATEST_JAVA21_TEM"
 echo "[INFO] Java $LATEST_JAVA21_TEM installed and set as default."
 echo "[INFO] Java install complete."
 
@@ -83,7 +83,7 @@ echo "[INFO] Java version check complete."
 echo "[INFO] Checking for Maven installation..."
 if ! command -v mvn >/dev/null 2>&1; then
   echo "[INFO] Installing Maven..."
-  sdk install maven -y
+  bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk install maven -y"
 else
   echo "[INFO] Maven already installed."
 fi
