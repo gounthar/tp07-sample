@@ -70,8 +70,8 @@ echo "[INFO] Java identifier check complete."
 
 # Install and set as default, auto-confirming prompts
 echo "[INFO] Installing Java $LATEST_JAVA21_TEM..."
-bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk install java $LATEST_JAVA21_TEM -y"
-bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && sdk default java $LATEST_JAVA21_TEM"
+sdk install java $LATEST_JAVA21_TEM -y
+sdk default java $LATEST_JAVA21_TEM
 echo "[INFO] Java $LATEST_JAVA21_TEM installed and set as default."
 echo "[INFO] Java install complete."
 
