@@ -33,7 +33,7 @@ jobs:
         run: ls -la target
 
       - name: Upload war file
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: war-file
           path: target/*.war
