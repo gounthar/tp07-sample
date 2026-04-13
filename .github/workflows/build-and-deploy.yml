@@ -82,7 +82,7 @@ jobs:
 
       - name: Create release
         id: create_release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ format('v{0}', steps.version.outputs.version) }}
           name: Release ${{ format('v{0}', steps.version.outputs.version) }}
