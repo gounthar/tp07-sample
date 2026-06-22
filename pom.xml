@@ -5,7 +5,7 @@
 
     <groupId>com.example</groupId>
     <artifactId>sample</artifactId>
-    <version>2026.06.02-100445</version>
+    <version>2026.06.22-082841</version>
     <packaging>war</packaging>
 
     <dependencies>
